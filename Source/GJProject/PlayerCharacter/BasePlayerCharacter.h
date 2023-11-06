@@ -7,6 +7,8 @@
 #include "InputActionValue.h"
 #include "BasePlayerCharacter.generated.h"
 
+class UCharacterMovementComponent;
+
 UCLASS()
 class GJPROJECT_API ABasePlayerCharacter : public ACharacter
 {
@@ -24,15 +26,22 @@ class GJPROJECT_API ABasePlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* JumpAction;
 
+	bool IsFalling = false;
+
 public:
 	ABasePlayerCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	class USoundBase* SoundJump;
+
 protected:
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Jumping(const FInputActionValue& Value);
+	void StopJump(const FInputActionValue& Value);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess= "true"))
