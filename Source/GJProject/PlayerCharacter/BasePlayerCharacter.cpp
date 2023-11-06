@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABasePlayerCharacter::ABasePlayerCharacter()
@@ -79,6 +80,33 @@ void ABasePlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ABasePlayerCharacter::Jumping(const FInputActionValue& Value)
+{
+	//UGameplayStatics::SpawnSoundAtLocation(this, SoundJump, GetActorLocation());
+	if (Controller != nullptr)
+	{
+		Jump();
+		
+
+		if(!IsFalling)
+		{
+			IsFalling = true;
+			UGameplayStatics::SpawnSoundAtLocation(this, SoundJump, GetActorLocation());
+			//IsFalling = false;
+		}
+		
+	}
+}
+
+void ABasePlayerCharacter::StopJump(const FInputActionValue& Value)
+{
+	if (Controller != nullptr)
+	{
+		StopJumping();
+		IsFalling = false;
+	}
+}
+
 void ABasePlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -99,9 +127,10 @@ void ABasePlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABasePlayerCharacter::Look);
 		
 		// Jump
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-	}
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABasePlayerCharacter::Jumping);
 
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABasePlayerCharacter::StopJump);
+	}
 }
 
